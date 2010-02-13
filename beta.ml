@@ -376,12 +376,14 @@ let rec beta_reduction = fun lm ->
                         else
                           (lm, false)
 
-let rec beta lm do_trans =
+let rec beta lm do_trans do_show_tree =
   let (lm', do_trans') = (beta_reduction lm) in
-    show_lm lm' default_indent;
-    print_endline "";
+    if not do_show_tree then (
+      show_lm lm' default_indent;
+      print_endline "";
+    );
     if do_trans' then (
-      beta (reduce_paren lm') do_trans' 
+      beta (reduce_paren lm') do_trans' do_show_tree
     )
     else 
       (lm', false)

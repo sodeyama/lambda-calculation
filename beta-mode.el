@@ -5,14 +5,25 @@
     mode-name "beta mode")
   (setq beta-local-map (make-keymap))
   (define-key beta-local-map "\C-cb" 'beta-reduction)
+  (define-key beta-local-map "\C-cn" 'beta-reduction-show-native-tree)
   (use-local-map beta-local-map))
 
 (defun beta-reduction ()
   (interactive)
+  (beta-reduction-inner "false"))
+
+(defun beta-reduction-show-native-tree ()
+  (interactive)
+  (beta-reduction-inner "true"))
+
+(defun beta-reduction-inner (is_tree)
   (save-excursion
     (let ((in_str (buffer-string)))
-      (start-process "beta-process" "*beta-buffer*" "/home/sode/git/lambda-calculation/beta" in_str)
+      (start-process "beta-process" "*beta-buffer*" "/home/sode/git/lambda-calculation/beta" in_str is_tree)
       (let ((buffer (get-buffer "*beta-buffer*")))
         (switch-to-buffer-other-window buffer)
         (goto-char (point-max))))))
+
+
+
 
