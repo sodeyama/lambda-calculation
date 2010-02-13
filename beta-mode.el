@@ -1,4 +1,6 @@
 ;; beta-mode
+(defvar betabin "/home/sode/git/lambda-calculation/beta")
+
 (defun beta-mode ()
   (interactive)
   (setq major-mode 'beta-mode
@@ -19,7 +21,7 @@
 (defun beta-reduction-inner (is_tree)
   (save-excursion
     (let ((in_str (buffer-string)))
-      (start-process "beta-process" "*beta-buffer*" "/home/sode/git/lambda-calculation/beta" in_str is_tree)
+      (start-process "beta-process" "*beta-buffer*" betabin in_str is_tree)
       (let ((buffer (get-buffer "*beta-buffer*")))
         (switch-to-buffer-other-window buffer)
         (goto-char (point-max))))))
