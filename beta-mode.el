@@ -10,9 +10,9 @@
 (defun beta-reduction ()
   (interactive)
   (save-excursion
-    (start-process "beta-process" "*beta-buffer*" "/home/sode/prog/ocaml/beta")
-    (let ((buffer (get-buffer "*beta-buffer*")))
-      (save-excursion
+    (let ((in_str (buffer-string)))
+      (start-process "beta-process" "*beta-buffer*" "/home/sode/git/lambda-calculation/beta" in_str)
+      (let ((buffer (get-buffer "*beta-buffer*")))
         (switch-to-buffer-other-window buffer)
         (goto-char (point-max))))))
 

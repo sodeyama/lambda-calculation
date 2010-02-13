@@ -18,8 +18,14 @@ let rec calc_lm lm f count =
         calc_lm_list lmlist f count
 
 let _ =
+  let (stream_type, in_str) = 
+    if Array.length Sys.argv > 1 then
+      (STRING, Sys.argv.(1))
+    else
+      (CHANNEL, "")
+  in
   let tokens =
-    get_tokens channel
+    get_tokens in_str stream_type
   in
   let (lm, _) =  parse (List.fold_left (fun x y -> y::x) [] tokens)
       (Lambda(["paren"],[])) (Lambda([], [])) false in 

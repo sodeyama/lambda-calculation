@@ -1,8 +1,9 @@
 type char_type = LPAREN | RPAREN | LAMBDA | DOT | OTHER
+type stream_type = STRING | CHANNEL
 type lambda_v = string list
 type tree = App of lambda_v | Lambda of lambda_v * tree list
 
-let channel = open_in "/home/sode/prog/ocaml/lambada.lm"
+let channel = open_in "/home/sode/prog/ocaml/lambda.lm"
 let token_buf = Buffer.create 64
 
 (* utilities *)
@@ -150,7 +151,13 @@ let check_type str =
     | "." -> DOT
     | _ -> OTHER
 
-let get_tokens ch =
+let get_tokens in_str stream_type =
+  let get_a_char idx =
+    if stream_type = STRING then
+      in_str.[idx]
+    else
+      input_char channel
+  in
   let add_token token_buf token tokens =
     if Buffer.length token_buf != 0 then (
       Buffer.clear token_buf;
@@ -159,30 +166,31 @@ let get_tokens ch =
       tokens
     )
   in
-  let rec get_char in_token tokens =
+  let rec get_char in_token tokens idx =
     try
-      let c = input_char ch in
+      let c = get_a_char idx in
         match check_type (String.make 1 c) with
             LPAREN|RPAREN|LAMBDA|DOT ->
               let token = Buffer.contents token_buf in
-                get_char false ((String.make 1 c)::(add_token token_buf token tokens))
+                get_char false ((String.make 1 c)::(add_token token_buf token tokens)) (idx + 1)
           | OTHER -> 
               match c with 
                   '\r' | '\n' | '\t' | ' ' -> 
                     let token = Buffer.contents token_buf in
-                      get_char false (add_token token_buf token tokens)
+                      get_char false (add_token token_buf token tokens) (idx + 1)
                 | _ -> 
                     if in_token then (
                       Buffer.add_char token_buf c;
-                      get_char false ((Buffer.contents token_buf)::tokens)
+                      get_char false ((Buffer.contents token_buf)::tokens) (idx + 1)
                     ) else (
                       Buffer.add_char token_buf c;
-                      get_char true tokens 
+                      get_char true tokens (idx + 1)
                     )
     with
         End_of_file -> tokens
+      | Invalid_argument in_str -> tokens
   in
-    get_char false []
+    get_char false [] 0
 
 (* parse. create Lambda tree *)
 let rec parse tokens lm cur_lm is_lambda =
